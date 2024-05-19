@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 import 'package:test/pages/createproject_page.dart';
+import 'package:test/styles.dart';
 
 import 'drawer.dart';
 
@@ -27,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Garmisch1968'),
+        title: Text('Garmisch1968',style: h4(),),
         flexibleSpace: Image(
           image: AssetImage('assets/background_Image.jpg'),
           fit: BoxFit.cover,
@@ -35,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
         leading: Builder(
           builder: (context) {
             return IconButton(
-              icon: const Icon(Icons.menu),
+              icon: const Icon(Icons.menu,color: Colors.white),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
