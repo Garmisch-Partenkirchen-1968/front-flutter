@@ -4,7 +4,8 @@ import 'package:test/components/home/home_header.dart';
 import 'package:test/pages/createproject_page.dart';
 import 'package:test/styles.dart';
 
-import 'drawer.dart';
+import '../components/common/AppBar.dart';
+import '../components/common/drawer.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -27,21 +28,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Garmisch1968',style: h4(),),
-        flexibleSpace: Image(
-          image: AssetImage('assets/background_Image.jpg'),
-          fit: BoxFit.cover,
-        ),
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu,color: Colors.white),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: CustomAppBar(
+          title: "appbar",
         ),
       ),
       drawer: CustomDrawer(title: 'cccc',),

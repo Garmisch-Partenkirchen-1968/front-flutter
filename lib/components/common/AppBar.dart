@@ -19,7 +19,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext) {
     return AppBar(
-      title: Text('Garmisch1968', style: h4(),),
+      title: Text(
+        "Garmisch1968",
+        style: TextStyle(fontFamily: 'Bebas Neue',
+          fontSize: 30,
+        color: Colors.white,),
+      ),
       flexibleSpace: Image(
         image: AssetImage('assets/background_Image.jpg'),
         fit: BoxFit.cover,
