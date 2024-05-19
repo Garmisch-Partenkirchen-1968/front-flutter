@@ -30,7 +30,7 @@ class CommonFormField extends StatelessWidget {
             ),
           ),
         ),
-        // 4. Positioned를 사용한 이유는 TextFormField 공간에 글자를 삽입하기 위해서 입니다.
+        //
         Positioned(
           top: 8,
           left: 20,

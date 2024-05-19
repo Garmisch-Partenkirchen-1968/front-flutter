@@ -3,6 +3,7 @@ import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 
 import '../components/createproject/createproject_body.dart';
+import 'drawer.dart';
 
 
 class CreateProjectPage extends StatefulWidget {
@@ -61,39 +62,7 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
           },
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text('Drawer Header'),
-            ),
-            ListTile(
-              title: const Text('Home'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(0);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Add project'),
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(0);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: CustomDrawer(title: 'cccc',),
       body:
       CreateProjectBody(),
     );

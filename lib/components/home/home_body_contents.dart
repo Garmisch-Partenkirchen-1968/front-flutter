@@ -12,11 +12,11 @@ class HomeBodyContents extends StatelessWidget {
     double bodyWidth = getBodyWidth(context);
     return Container(
       alignment: Alignment.center,
-      width: bodyHeight * 0.8,
+      //width: bodyHeight * 0.8,
+      child: Wrap(
 
-      child: GridView.count(
-        crossAxisCount : 2,
-        childAspectRatio: 3/2,
+        direction: Axis.horizontal, // 나열 방향
+        alignment: WrapAlignment.start,
         children: [
           ProjectList(),
           ProjectList(),

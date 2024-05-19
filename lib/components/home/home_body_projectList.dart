@@ -11,8 +11,9 @@ class ProjectList extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: gap_s, horizontal: gap_s),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        height: MediaQuery.of(context).size.height * 0.4,
+        width: 400,
+        //width: MediaQuery.of(context).size.width * 0.8,
+        //height: MediaQuery.of(context).size.height * 0.4,
         decoration: BoxDecoration(
           color: Colors.white60,
           borderRadius: BorderRadius.circular(20),
@@ -73,7 +74,8 @@ class ProjectList extends StatelessWidget {
   }
 
   Widget _buildListButton() {
-    return OutlinedButton(
+    return LayoutBuilder(
+      builder: (context, constraints) => OutlinedButton(
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
           backgroundColor: Colors.grey,
@@ -87,7 +89,20 @@ class ProjectList extends StatelessWidget {
         },
         child: Align(
           alignment: Alignment.centerLeft,
-          child: Text("[ 자료관리 1조 ] 트리메이커스", textAlign: TextAlign.left),
-        ));
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: AutoSizeText(
+              "[ 자료관리 1조 ] 트리메이커스",
+              maxFontSize: 15,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
