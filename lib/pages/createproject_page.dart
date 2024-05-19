@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 
+import '../components/common/AppBar.dart';
 import '../components/createproject/createproject_body.dart';
-import 'drawer.dart';
+import '../components/common/drawer.dart';
 
 
 class CreateProjectPage extends StatefulWidget {
@@ -45,21 +46,10 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Garmisch1968'),
-        flexibleSpace: Image(
-          image: AssetImage('assets/background.jpeg'),
-          fit: BoxFit.cover,
-        ),
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: CustomAppBar(
+          title: "appbar",
         ),
       ),
       drawer: CustomDrawer(title: 'cccc',),

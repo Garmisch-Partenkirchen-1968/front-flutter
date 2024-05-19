@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:test/components/common/AppBar.dart';
 import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 import 'package:test/pages/createproject_page.dart';
 import 'package:test/styles.dart';
 
-import '../components/common/AppBar.dart';
+import '../components/login/login_body.dart';
 import '../components/common/drawer.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-
-
+class _LoginPageState extends State<LoginPage> {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -34,8 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
           title: "appbar",
         ),
       ),
-      drawer: CustomDrawer(title: 'cccc',),
-      body: HomeBody(),
+      drawer: CustomDrawer(
+        title: 'cccc',
+      ),
+      body: LoginBody(),
     );
   }
 }
