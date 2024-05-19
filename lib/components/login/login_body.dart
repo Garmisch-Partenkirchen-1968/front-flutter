@@ -18,7 +18,7 @@ class _LoginBodyState extends State<LoginBody> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/images/img_blue.png'),
+            Text("gag",style: TextStyle(fontStyle: FontStyle.italic),)
             TextField(
               controller: idController,
               decoration: InputDecoration(
