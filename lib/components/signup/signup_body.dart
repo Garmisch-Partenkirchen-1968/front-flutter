@@ -6,14 +6,12 @@ import 'package:http/http.dart' as http;
 
 import 'package:test/pages/home_page.dart';
 
-import '../../pages/signup_page.dart';
-
-class LoginBody extends StatefulWidget {
+class SignupBody extends StatefulWidget {
   @override
-  _LoginBodyState createState() => _LoginBodyState();
+  _SignupBodyState createState() => _SignupBodyState();
 }
 
-class _LoginBodyState extends State<LoginBody> {
+class _SignupBodyState extends State<SignupBody> {
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -25,7 +23,7 @@ class _LoginBodyState extends State<LoginBody> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            "Garmisch1968",
+            "Garmisch1968\n회원가입",
             style: TextStyle(
               fontFamily: 'Bebas Neue',
               fontSize: 50,
@@ -74,22 +72,6 @@ class _LoginBodyState extends State<LoginBody> {
               } else { print(
                   'ERROR Status code: ${response.statusCode}');
               }
-            },
-            child: Text('로그인'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-            ),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SignUpPage(
-                      title: 'bbbb',
-                    )),
-              );
             },
             child: Text('회원가입'),
             style: ElevatedButton.styleFrom(
