@@ -49,19 +49,14 @@ class _LoginBodyState extends State<LoginBody> {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
-              final response = await http.post(
-                Uri.parse('http://localhost:8080/signup'),
-                headers: <String, String>{
-                  'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: jsonEncode(<String, String>{
-                  'username': idController.text,
-                  'password': passwordController.text,
-                }),
+              final url = Uri.parse(
+                'http://localhost:8080/signin?username=${idController.text}&password=${passwordController.text}',
               );
-              // debugPrint('Status code: ${response.statusCode}');
-              // debugPrint('Response body: ${response.body}');
-              if (response.statusCode == 201) {
+              final response = await http.get(url);
+
+              print('Response status: ${response.statusCode}');
+              print('Response body: ${response.body}');
+              if (response.statusCode == 200) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(

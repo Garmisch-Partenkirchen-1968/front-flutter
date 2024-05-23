@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 
 import 'package:test/pages/home_page.dart';
 
+import '../common/popup.dart';
+
 class SignupBody extends StatefulWidget {
   @override
   _SignupBodyState createState() => _SignupBodyState();
@@ -60,6 +62,7 @@ class _SignupBodyState extends State<SignupBody> {
               // debugPrint('Status code: ${response.statusCode}');
               // debugPrint('Response body: ${response.body}');
               if (response.statusCode == 201) {
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -69,7 +72,10 @@ class _SignupBodyState extends State<SignupBody> {
                 );
                 print(
                     'Logging in with ID: ${idController.text} and Password: ${passwordController.text}');
-              } else { print(
+              } else {
+                FlutterDialog(context, '다른 아이디와 비밀번호를 사용해주세요');
+
+                print(
                   'ERROR Status code: ${response.statusCode}');
               }
             },
