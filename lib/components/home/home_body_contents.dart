@@ -74,9 +74,9 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
             direction: Axis.horizontal, // 나열 방향
             alignment: WrapAlignment.start,
             children: [
-              _buildProjectCard(),
-              _buildProjectCard(),
-              _buildProjectCard(),
+              _buildProjectCard(projects[0]),
+              _buildProjectCard(projects[0]),
+
 
               //ProjectList(),
             ],
@@ -86,13 +86,13 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     );
   }
 
-  Widget _buildProjectCard() {
+  Widget _buildProjectCard(Project individualProject) {
     return Card(
       elevation: 4.0, // 카드의 그림자 깊이
       margin: EdgeInsets.all(8.0), // 주변 여백
       child: InkWell(
         onTap: () {
-          print('Project #${projects[0].id} clicked!');
+          print('Project #${individualProject.id} clicked!');
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -106,7 +106,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Project #${projects[0].id}', // 프로젝트 ID
+                'Project #${individualProject.id}', // 프로젝트 ID
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               ),
               SizedBox(height: 10.0), // 요소 간의 간격
               Text(
-                projects[0].name, // 프로젝트 이름
+                individualProject.name, // 프로젝트 이름
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               ),
               SizedBox(height: 5.0),
               Text(
-                projects[0].description, // 프로젝트 설명
+                individualProject.description, // 프로젝트 설명
                 style: TextStyle(
                   fontSize: 16.0,
                 ),

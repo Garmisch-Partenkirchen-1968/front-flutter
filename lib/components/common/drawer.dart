@@ -39,14 +39,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: const Text('Add project'),
             selected: _selectedIndex == 0,
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CreateProjectPage(
-                          title: 'bbbb',
-                        )),
-              );
+              // Navigator.pop(context);
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //       builder: (context) => CreateProjectPage(
+              //             title: 'bbbb',
+              //           )),
+              // );
             },
           ),
           ListTile(

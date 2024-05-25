@@ -15,12 +15,18 @@ import '../../login_session.dart';
 import '../common/common_form_field.dart';
 import '../common/popup.dart';
 import 'createproject_manage.dart';
+import 'package:test/login_session.dart';
 
-class CreateProjectBody extends StatelessWidget {
+
+class CreateProjectBody extends StatefulWidget {
+  @override
+  State<CreateProjectBody> createState() => _CreateProjectBodyState();
+}
+class _CreateProjectBodyState extends State<CreateProjectBody> {
   String projectName = '';
   String projectDescription = '';
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 
 

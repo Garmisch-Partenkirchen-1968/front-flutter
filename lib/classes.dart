@@ -34,16 +34,28 @@ class Issue {
     required this.status,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'issueId': this.issueId,
+      'title': this.title,
+      'reporter': this.reporter,
+      'reportedDate': this.reportedDate,
+      'fixer': this.fixer,
+      'assignee': this.assignee,
+      'priority': this.priority,
+      'status': this.status,
+    };
+  }
   factory Issue.fromJson(Map<String, dynamic> json) {
     return Issue(
-      issueId: json['issueId'],
-      title: json['title'],
-      reporter: json['reporter'],
-      reportedDate: json['reportedDate'] ?? "", // JSON에 값이 없는 경우 빈 문자열로 처리
-      fixer: json['fixer'] ?? "", // 값이 없는 경우 빈 문자열로 처리
-      assignee: json['assignee'],
-      priority: json['prioriry'], // 오타가 있으니 주의 ('priority'가 맞는 표기)
-      status: json['status'],
+      issueId: json['id'] as int,
+      title: json['title'] as String,
+      reporter: json['reporter']['username'] as String,
+      reportedDate: json['reportedDate'] as String,
+      fixer: json['fixer'] as String? ?? '',
+      assignee: json['assignee'] as String? ?? '',
+      priority: json['priority'] as String,
+      status: json['status'] as String,
     );
   }
 }
