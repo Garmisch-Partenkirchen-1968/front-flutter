@@ -6,14 +6,14 @@ import 'package:http/http.dart' as http;
 
 import 'package:test/pages/home_page.dart';
 
-import '../../pages/signup_page.dart';
+import '../common/popup.dart';
 
-class LoginBody extends StatefulWidget {
+class SignupBody extends StatefulWidget {
   @override
-  _LoginBodyState createState() => _LoginBodyState();
+  _SignupBodyState createState() => _SignupBodyState();
 }
 
-class _LoginBodyState extends State<LoginBody> {
+class _SignupBodyState extends State<SignupBody> {
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -25,7 +25,7 @@ class _LoginBodyState extends State<LoginBody> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            "Garmisch1968",
+            "Garmisch1968\n회원가입",
             style: TextStyle(
               fontFamily: 'Bebas Neue',
               fontSize: 50,
@@ -49,14 +49,20 @@ class _LoginBodyState extends State<LoginBody> {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
-              final url = Uri.parse(
-                'http://localhost:8080/signin?username=${idController.text}&password=${passwordController.text}',
+              final response = await http.post(
+                Uri.parse('http://localhost:8080/signup'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: jsonEncode(<String, String>{
+                  'username': idController.text,
+                  'password': passwordController.text,
+                }),
               );
-              final response = await http.get(url);
+              // debugPrint('Status code: ${response.statusCode}');
+              // debugPrint('Response body: ${response.body}');
+              if (response.statusCode == 201) {
 
-              print('Response status: ${response.statusCode}');
-              print('Response body: ${response.body}');
-              if (response.statusCode == 200) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -66,25 +72,12 @@ class _LoginBodyState extends State<LoginBody> {
                 );
                 print(
                     'Logging in with ID: ${idController.text} and Password: ${passwordController.text}');
-              } else { print(
+              } else {
+                FlutterDialog(context, '다른 아이디와 비밀번호를 사용해주세요');
+
+                print(
                   'ERROR Status code: ${response.statusCode}');
               }
-            },
-            child: Text('로그인'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-            ),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SignUpPage(
-                      title: 'bbbb',
-                    )),
-              );
             },
             child: Text('회원가입'),
             style: ElevatedButton.styleFrom(

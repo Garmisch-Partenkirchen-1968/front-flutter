@@ -14,17 +14,7 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-    ),
-    Text(
-      'Index 1: Business',
-    ),
-    Text(
-      'Index 2: School',
-    ),
-  ];
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -46,7 +36,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Text('Drawer Header'),
           ),
           ListTile(
-            title: const Text('My project'),
+            title: const Text('Add project'),
             selected: _selectedIndex == 0,
             onTap: () {
               Navigator.pop(context);
@@ -60,7 +50,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             },
           ),
           ListTile(
-            title: const Text('Add project'),
+            title: const Text('My project'),
             onTap: () {
 // Update the state of the app
               _onItemTapped(0);

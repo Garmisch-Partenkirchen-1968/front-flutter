@@ -1,16 +1,29 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:test/size.dart';
 import 'package:test/styles.dart';
+import 'package:provider/provider.dart';
 
+import '../../login_session.dart';
 import '../common/common_form_field.dart';
+import '../common/popup.dart';
 import 'createproject_manage.dart';
 
 class CreateProjectBody extends StatelessWidget {
+  String projectName = '';
+  String projectDescription = '';
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,23 +58,57 @@ class CreateProjectBody extends StatelessWidget {
 
   Widget _buildButtonSubmit(context) {
     return Padding(
-        padding: EdgeInsets.all(20),
-        child: Container(
-          height: getBodyHeight(context) * 0.2,
-          width: getBodyWidth(context),
-          alignment: Alignment.centerRight,
-          decoration: BoxDecoration(
-            color: Colors.white12,
-          ),
-          child: ElevatedButton.icon(
-            onPressed: () {
-              // Respond to button press
+      padding: EdgeInsets.all(20),
+      child: Container(
+        height: getBodyHeight(context) * 0.2,
+        width: getBodyWidth(context),
+        alignment: Alignment.centerRight,
+        decoration: BoxDecoration(
+          color: Colors.white12,
+        ),
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            if(this.formKey.currentState!.validate()) {
+
+              this.formKey.currentState?.save();
+            }
+
+            print(context.read<profile>());
+
+            final response =
+                await http.post(Uri.parse('http://localhost:8080/projects'),
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+
+
+                    body: jsonEncode(<String, String>{
+                      "username": context.read<profile>().username,
+                      "password": context.read<profile>().password,
+                      // "username": "12",
+                      // "password": "12",
+                      "name": projectName,
+                      "description": projectDescription,
+                    })
+
+                );
+
+            if (response.statusCode == 200) {
               Navigator.pop(context);
-            },
-            icon: Icon(Icons.add, size: 18),
-            label: Text("새 프로젝트"),
-          ),
-        ));
+              FlutterDialog(context, '프로젝트 생성 완료');
+              print('project created: ');
+            } else {
+              FlutterDialog(context, '프로젝트 생성 에러');
+
+              print('ERROR Status code: ${response.statusCode}');
+            }
+
+          },
+          icon: Icon(Icons.add, size: 18),
+          label: Text("새 프로젝트"),
+        ),
+      ),
+    );
   }
 
   Widget renderTextFormField({
@@ -107,14 +154,18 @@ class CreateProjectBody extends StatelessWidget {
             children: [
               renderTextFormField(
                 label: '프로젝트 이름 * ',
-                onSaved: (val) {},
+                onSaved: (val) {
+                  this.projectName = val;
+                },
                 validator: (val) {
                   return null;
                 },
               ),
               renderTextFormField(
                 label: '프로젝트 설명',
-                onSaved: (val) {},
+                onSaved: (val) {
+                  this.projectDescription = val;
+                },
                 validator: (val) {
                   return null;
                 },
