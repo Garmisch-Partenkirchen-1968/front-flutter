@@ -89,7 +89,7 @@ class ProjectList extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => IssueDescriptionPage()));
+            MaterialPageRoute(builder: (context) => ProjectPage(projectId: 0)));
 
           debugPrint('Received click');
         },

@@ -1,27 +1,36 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
+import 'package:http/http.dart' as http;
+import 'package:test/login_session.dart';
+import '../classes.dart';
 import '../components/common/AppBar.dart';
 import '../components/common/drawer.dart';
+import 'package:provider/provider.dart';
+
+import '../components/project/project_body.dart';
 
 //http://localhost:8080/h2-console/login.do?jsessionid=780d3785e2e6a2dec31f39a0ada107ba
 
+class ProjectPage extends StatefulWidget {
+  const ProjectPage({super.key, required this.projectId});
 
-class IssueDescriptionPage extends StatefulWidget {
+  final int projectId;
   @override
-  _IssueDescriptionPageState createState() => _IssueDescriptionPageState();
+  _ProjectPageState createState() => _ProjectPageState();
 }
 
-class _IssueDescriptionPageState extends State<IssueDescriptionPage> {
+class _ProjectPageState extends State<ProjectPage> {
+
+
+
 
 
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -32,68 +41,9 @@ class _IssueDescriptionPageState extends State<IssueDescriptionPage> {
       drawer: CustomDrawer(
         title: 'dddd',
       ),
-      body: SingleChildScrollView(
-
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Project Summary', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                      children: [
-                        Text("asdfasd"),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final url = Uri.parse(
-                              'http://localhost:8080/projects',
-                            );
-                            final response = await http.get(url);
-
-                            print('Response status: ${response.statusCode}');
-                            print('Response body: ${response.body}');
-
-                            // final uri =
-                            // Uri.https('http://localhost:8080.com', '/projects');
-                            // final response = await http.get(uri, headers: {
-                            //   //HttpHeaders.authorizationHeader: 'Token $token',
-                            //   HttpHeaders.contentTypeHeader: 'application/json',
-                            // });
-                            // debugPrint('Status code: ${response.statusCode}');
-                            // debugPrint('Response body: ${response.body}');
-
-
-                          },
-                          child: Text('로그인'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                          ),
-                        ),
-                        ],
-
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text('Sort Issues By:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
-              SizedBox(height: 20),
-              Text('Issue Descriptions:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-
-            ],
-          ),
-        ),
-      ),
+      body: ProjectBody(),
     );
   }
+
+
 }

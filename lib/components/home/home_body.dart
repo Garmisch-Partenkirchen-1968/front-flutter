@@ -13,9 +13,8 @@ class HomeBody extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
         child:
+
         HomeBodyContents(),
-
-
     );
   }
 }
