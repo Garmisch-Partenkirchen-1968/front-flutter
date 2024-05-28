@@ -2,15 +2,35 @@ class Project {
   final int id;
   final String name;
   final String description;
+  final List<int> members;
 
-  Project({required this.id, required this.name, required this.description});
+  Project({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.members,
+  });
+
 
   factory Project.fromJson(Map<String, dynamic> json) {
     return Project(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      members: json['members'] != null ? List<int>.from(json['members']) : [],
+
     );
+  }
+
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'members': members,
+
+    };
   }
 }
 class Issue {

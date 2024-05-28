@@ -85,10 +85,10 @@ class _CreateProjectBodyState extends State<CreateProjectBody> {
                       'Content-Type': 'application/json; charset=UTF-8',
                     },
                     body: jsonEncode(<String, String>{
-                      "username": context.read<profile>().username,
-                      "password": context.read<profile>().password,
-                      // "username": "12",
-                      // "password": "12",
+                      // "username": context.read<profile>().username,
+                      // "password": context.read<profile>().password,
+                      "username": "12",
+                      "password": "12",
                       "name": projectName,
                       "description": projectDescription,
                     }));

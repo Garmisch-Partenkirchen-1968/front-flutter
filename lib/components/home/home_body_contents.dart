@@ -26,6 +26,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     );
     final response = await http.get(url);
     final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
+    print('Response body: ${response.body}');
     projects = parsed.map<Project>((json) => Project.fromJson(json)).toList();
     setState(() {
       isLoading = false;
@@ -36,8 +37,6 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     print('Response body: ${response.body}');
 
     print(context.read<profile>().password);
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    print(projects[0].description);
   }
 
   @override
@@ -49,23 +48,33 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
 
   Widget build(BuildContext context) {
     if (projects.isEmpty) {
-      return CircularProgressIndicator();
+      return ElevatedButton(
+        onPressed: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CreateProjectPage(
+                      title: 'eeee',
+                    )),
+          );
+        },
+        child: Text('프로젝트 추가'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+        ),
+      );
     }
+
     return Column(
       children: [
-
         Container(
           alignment: Alignment.center,
           child: Wrap(
-            direction: Axis.horizontal, // 나열 방향
-            alignment: WrapAlignment.start,
-            children: [
-              _buildProjectCard(projects[0]),
-              _buildProjectCard(projects[0]),
-
-
-              //ProjectList(),
-            ],
+            spacing: 10.0, // 각 항목 사이의 가로 간격
+            runSpacing: 10.0, // 각 항목 사이의 세로 간격
+            children: projects.map((project) {
+              return _buildProjectCard(project);
+            }).toList(),
           ),
         ),
         ElevatedButton(
@@ -74,8 +83,8 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               context,
               MaterialPageRoute(
                   builder: (context) => CreateProjectPage(
-                    title: 'eeee',
-                  )),
+                        title: 'eeee',
+                      )),
             );
           },
           child: Text('프로젝트 추가'),
@@ -97,7 +106,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProjectPage(projectId : projects[0].id),
+              builder: (context) => ProjectPage(projectId: individualProject.id),
             ),
           );
         },

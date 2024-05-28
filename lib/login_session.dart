@@ -6,6 +6,17 @@ class profile with ChangeNotifier {
   String get username => _username;
   String get password => _password;
 
+  void updateUsername(String usernameInput) {
+    _username = usernameInput;
+
+    notifyListeners();
+  }
+  void updatePassword(String passwordInput) {
+    _password = passwordInput;
+
+    notifyListeners();
+  }
+
   // void remove() {
   //   _count--;
   //   notifyListeners();

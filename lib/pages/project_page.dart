@@ -37,7 +37,7 @@ class _ProjectPageState extends State<ProjectPage> {
       drawer: CustomDrawer(
         title: 'dddd',
       ),
-      body: ProjectBody(),
+      body: ProjectBody(projectId: widget.projectId,),
     );
   }
 
