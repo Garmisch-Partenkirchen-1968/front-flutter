@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:test/size.dart';
 import 'package:test/styles.dart';
 import '../../classes.dart';
 import '../../login_session.dart';
@@ -105,31 +106,17 @@ class _ProjectBodyState extends State<ProjectBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+
             Text('Project Summary',
                 style: subtitle1()),
+
             SizedBox(height: 10),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("asdfasd"),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text('프로젝트 로드'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            _buildFormField(context),
+            SizedBox(
+              height: 20,
             ),
+            CreateIssueButton(),
             SizedBox(height: 20),
             Text('Sort Issues By:',
                 style: subtitle2()),
@@ -300,6 +287,26 @@ class _ProjectBodyState extends State<ProjectBody> {
       label: Text("새 이슈 생성"),
     );
   }
+  Widget ProjectDescription(){
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      color: Colors.lime[50],
+      child: Form(
+        key: this.formKey,
+        child: Padding(
+          padding: EdgeInsets.all(gap_s),
+          child: Column(
+            children: [
+              // Text(),
+              // Text(data),
+
+            ],
+          ),
+        ),
+      ),
+
+    );
+  }
 
   Widget renderTextFormField({
     required String label,
@@ -339,7 +346,7 @@ class _ProjectBodyState extends State<ProjectBody> {
       child: Form(
         key: this.formKey,
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(gap_s),
           child: Column(
             children: [
               renderTextFormField(

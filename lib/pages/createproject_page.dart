@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 
 import '../components/common/AppBar.dart';
 import '../components/createproject/createproject_body.dart';
 import '../components/common/drawer.dart';
+
 
 
 class CreateProjectPage extends StatefulWidget {
@@ -31,7 +33,9 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
 
   void _onItemTapped(int index) {
     setState(() {
+
       _selectedIndex = index;
+
     });
   }
 
@@ -50,6 +54,7 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
         preferredSize: Size.fromHeight(100),
         child: CustomAppBar(
           title: "appbar",
+
         ),
       ),
       drawer: CustomDrawer(title: 'cccc',),

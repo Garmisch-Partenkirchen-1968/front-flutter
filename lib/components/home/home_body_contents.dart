@@ -53,21 +53,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     }
     return Column(
       children: [
-        ElevatedButton(
-          onPressed: () async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => CreateProjectPage(
-                        title: 'eeee',
-                      )),
-            );
-          },
-          child: Text('프로젝트 추가'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-          ),
-        ),
+
         Container(
           alignment: Alignment.center,
           child: Wrap(
@@ -80,6 +66,21 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
 
               //ProjectList(),
             ],
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CreateProjectPage(
+                    title: 'eeee',
+                  )),
+            );
+          },
+          child: Text('프로젝트 추가'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
           ),
         ),
       ],
