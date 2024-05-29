@@ -8,6 +8,7 @@ import 'package:test/size.dart';
 import 'package:test/styles.dart';
 import '../../classes.dart';
 import '../../login_session.dart';
+import '../../pages/issue_page.dart';
 import '../common/popup.dart';
 
 class ProjectBody extends StatefulWidget {
@@ -34,21 +35,43 @@ class _ProjectBodyState extends State<ProjectBody> {
   String description = '';
   List<int> members = [];
 
-  getIssueData(int projectId) async {
+  // getIssueData(int projectId) async {
+  //   final url = Uri.parse(
+  //     'http://localhost:8080/projects/${widget.projectId}/issues?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
+  //   );
+  //   final response = await http.get(url);
+  //   print("ppppppppppppppppppp");
+  //   print(widget.projectId);
+  //
+  //   final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
+  //   Issues = parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
+  //
+  //   setState(() {
+  //     isIssueLoading = false;
+  //     filteredIssues = Issues;
+  //   });
+  //   print('Response status: ${response.statusCode}');
+  //   print('Response body: ${response.body}');
+  // }
+  Future<void> getIssueData() async {
     final url = Uri.parse(
       'http://localhost:8080/projects/${widget.projectId}/issues?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
     final response = await http.get(url);
-    print("ppppppppppppppppppp");
-    print(widget.projectId);
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200) {
+      final List<dynamic> parsed = jsonDecode(response.body);
+      setState(() {
+        Issues = parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
+        isIssueLoading = false;
+      });
+    } else {
+      setState(() {
+        isIssueLoading = false;
+      });
+      print('Failed to load issues');
+    }
 
-    final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-    Issues = parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
-
-    setState(() {
-      isIssueLoading = false;
-      filteredIssues = Issues;
-    });
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
@@ -78,7 +101,17 @@ class _ProjectBodyState extends State<ProjectBody> {
       } else if (criteria == 'status') {
         Issues.sort((a, b) => a.status.compareTo(b.status));
       } else if (criteria == 'assignee') {
-        Issues.sort((a, b) => a.assignee.compareTo(b.assignee));
+        Issues.sort((a, b) {
+          if (a.assignee == null && b.assignee == null) {
+            return 0;
+          } else if (a.assignee == null) {
+            return 1; // null values go to the end
+          } else if (b.assignee == null) {
+            return -1; // null values go to the end
+          } else {
+            return a.assignee!.compareTo(b.assignee!);
+          }
+        });
       }
     });
   }
@@ -94,13 +127,12 @@ class _ProjectBodyState extends State<ProjectBody> {
                 .toLowerCase()
                 .contains(searchKeyword.toLowerCase());
           } else if (searchField == 'Reporter') {
-            return issue.reporter
+            return issue.reporter.username
                 .toLowerCase()
                 .contains(searchKeyword.toLowerCase());
           } else if (searchField == 'Assignee') {
-            return issue.assignee
-                .toLowerCase()
-                .contains(searchKeyword.toLowerCase());
+
+            return issue.assignee?.toLowerCase().contains(searchKeyword.toLowerCase()) ?? false;
           } else if (searchField == 'Priority') {
             return issue.priority
                 .toLowerCase()
@@ -115,7 +147,7 @@ class _ProjectBodyState extends State<ProjectBody> {
   @override
   void initState() {
     super.initState();
-    getIssueData(widget.projectId);
+    getIssueData();
     getProjectData(widget.projectId);
   }
 
@@ -204,15 +236,27 @@ class _ProjectBodyState extends State<ProjectBody> {
             ),
             SizedBox(height: 20),
             Text('Issue Descriptions:', style: subtitle1()),
+
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: filteredIssues.length,
+              itemCount: Issues.length,
               itemBuilder: (context, index) {
-                final issue = filteredIssues[index];
+                final issue = Issues[index];
                 return Card(
                   elevation: 4,
                   margin: EdgeInsets.symmetric(vertical: 8),
+                    child: InkWell(
+                    onTap: () {
+                  print('Issue #${index} clicked!');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => IssuePage(projectId: widget.projectId, issueId: index,),
+                    ),
+                  );
+                },
+
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -232,7 +276,7 @@ class _ProjectBodyState extends State<ProjectBody> {
                         Text('Status: ${issue.status}'),
                       ],
                     ),
-                  ),
+                  ),),
                 );
               },
             ),
@@ -279,7 +323,8 @@ class _ProjectBodyState extends State<ProjectBody> {
         print(context.read<profile>());
 
         final response = await http.post(
-            Uri.parse('http://localhost:8080/projects/${widget.projectId}/issues'),
+            Uri.parse(
+                'http://localhost:8080/projects/${widget.projectId}/issues'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -300,11 +345,15 @@ class _ProjectBodyState extends State<ProjectBody> {
           "title": title,
           "priority": priority,
         }));
+
         if (response.statusCode == 201) {
-          FlutterDialog(context, '프로젝트 생성 완료');
+
+          FlutterDialog(context, '이슈 생성 완료');
+
           print('project created: ');
+          getIssueData();
         } else {
-          FlutterDialog(context, '프로젝트 생성 에러');
+          FlutterDialog(context, '이슈 생성 에러');
 
           print('ERROR Status code: ${response.statusCode}');
         }

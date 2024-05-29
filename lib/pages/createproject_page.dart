@@ -59,7 +59,8 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
       ),
       drawer: CustomDrawer(title: 'cccc',),
       body:
-      CreateProjectBody(),
+        null
+      //CreateProjectBody(),
     );
   }
 
