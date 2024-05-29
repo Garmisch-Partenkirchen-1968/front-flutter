@@ -59,7 +59,6 @@ class _IssueBodyState extends State<IssueBody> {
   @override
   void initState() {
     super.initState();
-
     getIssueCommentsData();
   }
 

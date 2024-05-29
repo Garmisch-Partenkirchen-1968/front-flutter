@@ -362,7 +362,7 @@ class _ProjectBodyState extends State<ProjectBody> {
         });
       },
       icon: Icon(Icons.add, size: 18),
-      label: Text("새 이슈 생성"),
+      label: Text("New Issue"),
     );
   }
 
@@ -430,7 +430,7 @@ class _ProjectBodyState extends State<ProjectBody> {
           child: Column(
             children: [
               renderTextFormField(
-                label: '이슈 이름 * ',
+                label: 'Issue title * ',
                 onSaved: (val) {
                   this.title = val;
                 },

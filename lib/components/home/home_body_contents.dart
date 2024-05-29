@@ -24,8 +24,9 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     final url = Uri.parse(
       'http://localhost:8080/projects?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
+    print(context.read<profile>().password);
     final response = await http.get(url);
-    final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
+    final parsed = jsonDecode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
     print('Response body: ${response.body}');
     projects = parsed.map<Project>((json) => Project.fromJson(json)).toList();
     setState(() {
@@ -65,8 +66,10 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
       );
     }
 
-    return Column(
+    return SingleChildScrollView( child:
+      Column(
       children: [
+
         Container(
           alignment: Alignment.center,
           child: Wrap(
@@ -76,7 +79,8 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               return _buildProjectCard(project);
             }).toList(),
           ),
-        ),
+          ),
+
         ElevatedButton(
           onPressed: () async {
             Navigator.push(
@@ -92,7 +96,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
             backgroundColor: Colors.blue,
           ),
         ),
-      ],
+      ],),
     );
   }
 
