@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:test/components/home/home_body.dart';
 import 'package:test/components/home/home_header.dart';
 
 import '../components/common/AppBar.dart';
 import '../components/createproject/createproject_body.dart';
 import '../components/common/drawer.dart';
-
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key, required this.title});
@@ -15,19 +15,9 @@ class CreateProjectPage extends StatefulWidget {
   @override
   State<CreateProjectPage> createState() => _CreateProjectPagePageState();
 }
+
 class _CreateProjectPagePageState extends State<CreateProjectPage> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-    ),
-    Text(
-      'Index 1: Business',
-    ),
-    Text(
-      'Index 2: School',
-    ),
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -41,8 +31,6 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
     throw UnimplementedError();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +40,10 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
           title: "appbar",
         ),
       ),
-      drawer: CustomDrawer(title: 'cccc',),
-      body:
-      CreateProjectBody(),
+      drawer: CustomDrawer(
+        title: 'cccc',
+      ),
+      body: CreateProjectBody(),
     );
   }
-
-
 }

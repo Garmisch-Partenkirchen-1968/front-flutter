@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_provider/flutter_provider.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:test/login_session.dart';
 
 import 'package:test/pages/home_page.dart';
 
@@ -53,6 +56,12 @@ class _LoginBodyState extends State<LoginBody> {
                 'http://localhost:8080/signin?username=${idController.text}&password=${passwordController.text}',
               );
               final response = await http.get(url);
+              print(context.read<profile>().username);
+              context.read<profile>()
+                  .updateUsername(idController.text);
+              context.read<profile>()
+                  .updateUsername(passwordController.text);
+
 
               print('Response status: ${response.statusCode}');
               print('Response body: ${response.body}');
@@ -66,8 +75,8 @@ class _LoginBodyState extends State<LoginBody> {
                 );
                 print(
                     'Logging in with ID: ${idController.text} and Password: ${passwordController.text}');
-              } else { print(
-                  'ERROR Status code: ${response.statusCode}');
+              } else {
+                print('ERROR Status code: ${response.statusCode}');
               }
             },
             child: Text('로그인'),
@@ -82,8 +91,8 @@ class _LoginBodyState extends State<LoginBody> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => SignUpPage(
-                      title: 'bbbb',
-                    )),
+                          title: 'bbbb',
+                        )),
               );
             },
             child: Text('회원가입'),

@@ -16,13 +16,24 @@ import '../common/common_form_field.dart';
 import '../common/popup.dart';
 import 'createproject_manage.dart';
 
-class CreateProjectBody extends StatelessWidget {
+class CreateProjectBody extends StatefulWidget {
+  @override
+  State<CreateProjectBody> createState() => _CreateProjectBodyState();
+}
+
+class _CreateProjectBodyState extends State<CreateProjectBody> {
   String projectName = '';
   String projectDescription = '';
+  final List<String> roles = ['admin', 'pl', 'tester', 'dev'];
+  final Map<String, bool> selectedRoles = {
+    'admin': false,
+    'pl': false,
+    'tester': false,
+    'dev': false
+  };
+  int createdProjectId = 999999;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +59,9 @@ class CreateProjectBody extends StatelessWidget {
               ),
             ),
             _buildFormField(context),
-            ProjectMemberPage(),
+            _buildRoleCheckboxes(),
+            // ProjectMemberPage(),
+
             _buildButtonSubmit(context),
           ],
         ),
@@ -68,33 +81,62 @@ class CreateProjectBody extends StatelessWidget {
         ),
         child: ElevatedButton.icon(
           onPressed: () async {
-            if(this.formKey.currentState!.validate()) {
-
+            if (this.formKey.currentState!.validate()) {
               this.formKey.currentState?.save();
             }
-
-            print(context.read<profile>());
-
             final response =
                 await http.post(Uri.parse('http://localhost:8080/projects'),
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
                     },
-
-
                     body: jsonEncode(<String, String>{
-                      "username": context.read<profile>().username,
-                      "password": context.read<profile>().password,
-                      // "username": "12",
-                      // "password": "12",
+                      // "username": context.read<profile>().username,
+                      // "password": context.read<profile>().password,
+                      "username": "11",
+                      "password": "11",
                       "name": projectName,
                       "description": projectDescription,
-                    })
+                    }));
 
-                );
+            // final permissionResponse = await http.post(
+            //     Uri.parse(
+            //         'http://localhost:8080/projects/${createdProjectId}/permissions/11'),
+            //     headers: <String, String>{
+            //       'Content-Type': 'application/json; charset=UTF-8',
+            //     },
+            //     body: jsonEncode(<String, dynamic>{
+            //       "username": "11",
+            //       "password": "11",
+            //       "permissions": [false, false, true, false]
+            //     }));
+            print("dddddddddddddddddd");
+            print(response.body);
 
-            if (response.statusCode == 200) {
-              Navigator.pop(context);
+            if (response.statusCode == 201) {
+
+              final responseBody = jsonDecode(response.body);
+              createdProjectId = responseBody['id'];
+
+
+              final permissionResponse = await http.patch(
+                Uri.parse(
+                    'http://localhost:8080/projects/$createdProjectId/permissions/6'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: jsonEncode(<String, dynamic>{
+                  "username": "11",
+                  "password": "11",
+                  // "permissions": selectedRoles.values.toList(),
+                  "permissions": [true, true, true, true]
+                }),
+              );
+              print("ccccccccccccccccccccc");
+              print(permissionResponse.body);
+
+              if (permissionResponse.statusCode == 200) {
+                Navigator.pop(context);
+              }
               FlutterDialog(context, '프로젝트 생성 완료');
               print('project created: ');
             } else {
@@ -102,11 +144,35 @@ class CreateProjectBody extends StatelessWidget {
 
               print('ERROR Status code: ${response.statusCode}');
             }
-
           },
           icon: Icon(Icons.add, size: 18),
           label: Text("새 프로젝트"),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRoleCheckboxes() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: roles.map((role) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: selectedRoles[role],
+                onChanged: (bool? value) {
+                  setState(() {
+                    selectedRoles[role] = value!;
+                  });
+                },
+              ),
+              Text(role),
+              SizedBox(width: 10), // Add spacing between checkboxes if needed
+            ],
+          );
+        }).toList(),
       ),
     );
   }

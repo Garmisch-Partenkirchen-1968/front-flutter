@@ -5,23 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/login_session.dart';
 import '../classes.dart';
+import '../components/Issue/issue_body.dart';
 import '../components/common/AppBar.dart';
 import '../components/common/drawer.dart';
 import 'package:provider/provider.dart';
 
 import '../components/project/project_body.dart';
 
-//http://localhost:8080/h2-console/login.do?jsessionid=780d3785e2e6a2dec31f39a0ada107ba
-
-class ProjectPage extends StatefulWidget {
-  const ProjectPage({super.key, required this.projectId});
+class IssuePage extends StatefulWidget {
+  const IssuePage({super.key, required this.projectId, required this.issueId});
 
   final int projectId;
+  final int issueId;
   @override
-  _ProjectPageState createState() => _ProjectPageState();
+  _IssuePageState createState() => _IssuePageState();
 }
 
-class _ProjectPageState extends State<ProjectPage> {
+class _IssuePageState extends State<IssuePage> {
 
 
   @override
@@ -37,7 +37,7 @@ class _ProjectPageState extends State<ProjectPage> {
       drawer: CustomDrawer(
         title: 'dddd',
       ),
-      body: ProjectBody(projectId: widget.projectId,),
+      body: IssueBody(projectId: widget.projectId, issueId: widget.issueId,),
     );
   }
 

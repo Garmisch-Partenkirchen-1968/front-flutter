@@ -24,8 +24,10 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     final url = Uri.parse(
       'http://localhost:8080/projects?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
+    print(context.read<profile>().password);
     final response = await http.get(url);
-    final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
+    final parsed = jsonDecode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
+    print('Response body: ${response.body}');
     projects = parsed.map<Project>((json) => Project.fromJson(json)).toList();
     setState(() {
       isLoading = false;
@@ -36,8 +38,6 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     print('Response body: ${response.body}');
 
     print(context.read<profile>().password);
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    print(projects[0].description);
   }
 
   @override
@@ -49,10 +49,38 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
 
   Widget build(BuildContext context) {
     if (projects.isEmpty) {
-      return CircularProgressIndicator();
+      return ElevatedButton(
+        onPressed: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CreateProjectPage(
+                      title: 'eeee',
+                    )),
+          );
+        },
+        child: Text('프로젝트 추가'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+        ),
+      );
     }
-    return Column(
+
+    return SingleChildScrollView( child:
+      Column(
       children: [
+
+        Container(
+          alignment: Alignment.center,
+          child: Wrap(
+            spacing: 10.0, // 각 항목 사이의 가로 간격
+            runSpacing: 10.0, // 각 항목 사이의 세로 간격
+            children: projects.map((project) {
+              return _buildProjectCard(project);
+            }).toList(),
+          ),
+          ),
+
         ElevatedButton(
           onPressed: () async {
             Navigator.push(
@@ -68,35 +96,21 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
             backgroundColor: Colors.blue,
           ),
         ),
-        Container(
-          alignment: Alignment.center,
-          child: Wrap(
-            direction: Axis.horizontal, // 나열 방향
-            alignment: WrapAlignment.start,
-            children: [
-              _buildProjectCard(),
-              _buildProjectCard(),
-              _buildProjectCard(),
-
-              //ProjectList(),
-            ],
-          ),
-        ),
-      ],
+      ],),
     );
   }
 
-  Widget _buildProjectCard() {
+  Widget _buildProjectCard(Project individualProject) {
     return Card(
       elevation: 4.0, // 카드의 그림자 깊이
       margin: EdgeInsets.all(8.0), // 주변 여백
       child: InkWell(
         onTap: () {
-          print('Project #${projects[0].id} clicked!');
+          print('Project #${individualProject.id} clicked!');
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProjectPage(projectId : projects[0].id),
+              builder: (context) => ProjectPage(projectId: individualProject.id),
             ),
           );
         },
@@ -106,7 +120,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Project #${projects[0].id}', // 프로젝트 ID
+                'Project #${individualProject.id}', // 프로젝트 ID
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -115,7 +129,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               ),
               SizedBox(height: 10.0), // 요소 간의 간격
               Text(
-                projects[0].name, // 프로젝트 이름
+                individualProject.name, // 프로젝트 이름
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -123,7 +137,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
               ),
               SizedBox(height: 5.0),
               Text(
-                projects[0].description, // 프로젝트 설명
+                individualProject.description, // 프로젝트 설명
                 style: TextStyle(
                   fontSize: 16.0,
                 ),
