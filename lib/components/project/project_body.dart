@@ -252,7 +252,7 @@ class _ProjectBodyState extends State<ProjectBody> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => IssuePage(projectId: widget.projectId, issueId: index,),
+                      builder: (context) => IssuePage(projectId: widget.projectId, issueId: issue.issueId,),
                     ),
                   );
                 },

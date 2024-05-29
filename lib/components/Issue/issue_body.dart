@@ -35,31 +35,37 @@ class _IssueBodyState extends State<IssueBody> {
   // String description = '';
   // List<int> members = [];
 
-
-  getIssueCommentsData() async {
+  getCommentsData() async {
     final url = Uri.parse(
       'http://localhost:8080/projects/${widget.projectId}/issues/${widget.issueId}?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
     final response = await http.get(url);
     print(response.body);
 
-    final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-    currentIssue =
-        parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
+    final parsed = jsonDecode(response.body);
+
+    if (parsed is Map<String, dynamic>) {
+      currentIssue = Issue.fromJson(parsed);
+      Comments = currentIssue.comments;
+    } else {
+      print('Unexpected response format');
+      return;
+    }
 
     setState(() {
       isIssueLoading = false;
     });
+    print("hhhhhhhhhhhhhhhhhhh");
     print('Response status: ${response.statusCode}');
+
     print('Response body: ${response.body}');
+    print('Response comments: ${Comments[0].content}');
   }
-
-
 
   @override
   void initState() {
     super.initState();
-    getIssueCommentsData();
+    getCommentsData();
   }
 
   Widget build(BuildContext context) {
@@ -97,9 +103,11 @@ class _IssueBodyState extends State<IssueBody> {
             CreateCommentButton(),
 
             Text('comments:', style: subtitle1()),
+            SizedBox(height: 20),
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
+              itemCount: Comments.length,
               itemBuilder: (context, index) {
                 final comment = Comments[index];
                 return Card(
@@ -115,12 +123,11 @@ class _IssueBodyState extends State<IssueBody> {
                         SizedBox(height: 8),
                         Text('content: ${comment.content}'),
                         SizedBox(height: 4),
-                        Text('commenter: ${comment.commenter}'),
+                        Text('commenter: ${comment.commenter.username}'),
                         SizedBox(height: 4),
                         Text('commentedDate: ${comment.commentedDate}'),
                         SizedBox(height: 4),
                         Text('isDescription: ${comment.isDescription}'),
-
                       ],
                     ),
                   ),
@@ -132,8 +139,6 @@ class _IssueBodyState extends State<IssueBody> {
       ),
     );
   }
-
-
 
   // Widget CreateCommentButton() {
   //   return ElevatedButton.icon(
@@ -228,14 +233,13 @@ class _IssueBodyState extends State<IssueBody> {
         print(jsonEncode(<String, dynamic>{
           "username": context.read<profile>().username,
           "password": context.read<profile>().password,
-          "content":" content",
+          "content": " content",
           "isDescription": isDescription,
         }));
 
-
         if (response.statusCode == 201) {
           FlutterDialog(context, '댓글 작성 완료');
-          print('project created: ');
+          print('comment created: ');
         } else {
           FlutterDialog(context, '댓글 작성 에러');
 
@@ -249,6 +253,7 @@ class _IssueBodyState extends State<IssueBody> {
       label: Text("new comment"),
     );
   }
+
   Widget renderTextFormField({
     required String label,
     required FormFieldSetter onSaved,
@@ -291,7 +296,7 @@ class _IssueBodyState extends State<IssueBody> {
           child: Column(
             children: [
               renderTextFormField(
-                label: ' 댓글 내용 ',
+                label: 'Comment contents',
                 onSaved: (val) {
                   this.content = val;
                 },
@@ -305,9 +310,7 @@ class _IssueBodyState extends State<IssueBody> {
                   this.isDescription = val;
                 },
                 validator: (val) {
-                  if (val == "true" ||
-                      val == "false"
-                     )
+                  if (val == "true" || val == "false")
                     return null;
                   else
                     return "Write true or false";
