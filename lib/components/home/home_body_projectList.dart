@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:test/constants.dart';
 import 'package:test/size.dart';
-import 'package:test/styles.dart';
 
 import '../../pages/project_page.dart';
 

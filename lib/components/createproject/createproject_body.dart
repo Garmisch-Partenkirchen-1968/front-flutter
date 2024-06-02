@@ -1,27 +1,29 @@
 import 'dart:convert';
-
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/widgets.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:test/size.dart';
 import 'package:test/styles.dart';
-import 'package:provider/provider.dart';
 
 import '../../login_session.dart';
-import '../common/common_form_field.dart';
+
+import '../../pages/home_page.dart';
 import '../common/popup.dart';
-import 'createproject_manage.dart';
 
 class CreateProjectBody extends StatefulWidget {
+  final String username;
+
+  final String password;
+
+  const CreateProjectBody({super.key, required this.username,required this.password });
+
   @override
   State<CreateProjectBody> createState() => _CreateProjectBodyState();
 }
 
 class _CreateProjectBodyState extends State<CreateProjectBody> {
+
+
   String projectName = '';
   String projectDescription = '';
   final List<String> roles = ['admin', 'pl', 'tester', 'dev'];
@@ -59,7 +61,7 @@ class _CreateProjectBodyState extends State<CreateProjectBody> {
               ),
             ),
             _buildFormField(context),
-            _buildRoleCheckboxes(),
+            //_buildRoleCheckboxes(),
             // ProjectMemberPage(),
 
             _buildButtonSubmit(context),
@@ -84,58 +86,59 @@ class _CreateProjectBodyState extends State<CreateProjectBody> {
             if (this.formKey.currentState!.validate()) {
               this.formKey.currentState?.save();
             }
+
+
             final response =
                 await http.post(Uri.parse('http://localhost:8080/projects'),
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
                     },
                     body: jsonEncode(<String, String>{
-                      // "username": context.read<profile>().username,
-                      // "password": context.read<profile>().password,
-                      "username": "11",
-                      "password": "11",
+                      "username": widget.username,
+                      "password": widget.password,
+
                       "name": projectName,
                       "description": projectDescription,
                     }));
 
-            // final permissionResponse = await http.post(
-            //     Uri.parse(
-            //         'http://localhost:8080/projects/${createdProjectId}/permissions/11'),
-            //     headers: <String, String>{
-            //       'Content-Type': 'application/json; charset=UTF-8',
-            //     },
-            //     body: jsonEncode(<String, dynamic>{
-            //       "username": "11",
-            //       "password": "11",
-            //       "permissions": [false, false, true, false]
-            //     }));
+
             print("dddddddddddddddddd");
+            print(widget.password);
+            print(jsonEncode(<String, String>{
+              "username": widget.username,
+              "password": widget.password,
+
+              "name": projectName,
+              "description": projectDescription,
+            }));
             print(response.body);
 
             if (response.statusCode == 201) {
-
               final responseBody = jsonDecode(response.body);
               createdProjectId = responseBody['id'];
 
-
               final permissionResponse = await http.patch(
                 Uri.parse(
-                    'http://localhost:8080/projects/$createdProjectId/permissions/6'),
+                    'http://localhost:8080/projects/$createdProjectId/permissions/1'),// userid 수정필요
+                //_______________________________
                 headers: <String, String>{
                   'Content-Type': 'application/json; charset=UTF-8',
                 },
                 body: jsonEncode(<String, dynamic>{
-                  "username": "11",
-                  "password": "11",
-                  // "permissions": selectedRoles.values.toList(),
+                  "username": widget.username,
+                  "password": widget.password,
                   "permissions": [true, true, true, true]
                 }),
               );
-              print("ccccccccccccccccccccc");
-              print(permissionResponse.body);
 
               if (permissionResponse.statusCode == 200) {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                        title: 'eeee',
+                      )),
+                );
               }
               FlutterDialog(context, '프로젝트 생성 완료');
               print('project created: ');
@@ -182,8 +185,6 @@ class _CreateProjectBodyState extends State<CreateProjectBody> {
     required FormFieldSetter onSaved,
     required FormFieldValidator validator,
   }) {
-    assert(onSaved != null);
-    assert(validator != null);
 
     return Column(
       children: [
