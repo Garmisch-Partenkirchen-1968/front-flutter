@@ -422,10 +422,10 @@ class _ProjectBodyState extends State<ProjectBody> {
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: filteredIssues.length,
+      itemCount: Issues.length,
       //-------------------------
       itemBuilder: (context, index) {
-        final issue = filteredIssues[index];
+        final issue = Issues[index];//final issue = filteredIssues[index];
         //-------------------------
         return Card(
           elevation: 4,
