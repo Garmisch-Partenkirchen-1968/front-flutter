@@ -1,16 +1,21 @@
-# test
 
-A new Flutter application.
+### Introduction
+A new Flutter application(이슈관리 시스템 개발) for 24-1 software engineering class
 
 ## Getting Started
 
 This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### Just push the build button !!
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Used package list
+
+cupertino_icons: ^1.0.2
+flutter_screenutil: ^5.9.0
+auto_size_text: ^3.0.0
+intl: ^0.17.0
+http: ^1.2.1
+flutter_provider: ^2.1.0
+provider: ^6.1.2
+charts_flutter: ^0.12.0
