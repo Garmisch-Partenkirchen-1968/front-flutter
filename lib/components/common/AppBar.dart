@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../styles.dart';
 
 
 class CustomAppBar extends StatefulWidget {

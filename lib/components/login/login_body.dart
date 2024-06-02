@@ -1,7 +1,5 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_provider/flutter_provider.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -60,7 +58,7 @@ class _LoginBodyState extends State<LoginBody> {
               context.read<profile>()
                   .updateUsername(idController.text);
               context.read<profile>()
-                  .updateUsername(passwordController.text);
+                  .updatePassword(passwordController.text);
 
 
               print('Response status: ${response.statusCode}');

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'package:test/components/home/home_body.dart';
-import 'package:test/components/home/home_header.dart';
 
 import '../components/common/AppBar.dart';
 import '../components/createproject/createproject_body.dart';
 import '../components/common/drawer.dart';
+import '../login_session.dart';
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key, required this.title});
@@ -20,6 +20,7 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
+
     setState(() {
       _selectedIndex = index;
     });
@@ -33,6 +34,7 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -43,7 +45,8 @@ class _CreateProjectPagePageState extends State<CreateProjectPage> {
       drawer: CustomDrawer(
         title: 'cccc',
       ),
-      body: CreateProjectBody(),
+      body:CreateProjectBody(username: context.read<profile>().username,password: context.read<profile>().password,),
+
     );
   }
 }

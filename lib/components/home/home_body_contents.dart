@@ -2,16 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:test/size.dart';
-import 'package:test/styles.dart';
 import 'package:http/http.dart' as http;
 import '../../classes.dart';
 import '../../login_session.dart';
 import '../../pages/createproject_page.dart';
 import '../../pages/project_page.dart';
-import 'home_body_projectList.dart';
 
 class HomeBodyContents extends StatefulWidget {
+
   @override
   State<HomeBodyContents> createState() => _HomeBodyContentsState();
 }
@@ -45,13 +43,14 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     // TODO: implement initState
     super.initState();
     getData();
+
   }
 
   Widget build(BuildContext context) {
     if (projects.isEmpty) {
       return ElevatedButton(
         onPressed: () async {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => CreateProjectPage(
@@ -69,6 +68,7 @@ class _HomeBodyContentsState extends State<HomeBodyContents> {
     return SingleChildScrollView( child:
       Column(
       children: [
+        Text("welcome ${context.read<profile>().username}"),
 
         Container(
           alignment: Alignment.center,

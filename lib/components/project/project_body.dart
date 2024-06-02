@@ -10,6 +10,7 @@ import '../../classes.dart';
 import '../../login_session.dart';
 import '../../pages/issue_page.dart';
 import '../common/popup.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class ProjectBody extends StatefulWidget {
   const ProjectBody({super.key, required this.projectId});
@@ -30,39 +31,48 @@ class _ProjectBodyState extends State<ProjectBody> {
   String searchField = 'Title';
   String searchKeyword = '';
 
+  // Project currentProject={9999, "example", "description", [1, 3, 7, 8, 4]} as Project;
   late Project currentProject;
   String name = '';
   String description = '';
   List<int> members = [];
+  List<IssueStatistics> data = [];
+  String assignee = '';
+  List<String> assigneeOptions = [];
+  late List<User> Users = [];
+  String fixer = '';
 
-  // getIssueData(int projectId) async {
-  //   final url = Uri.parse(
-  //     'http://localhost:8080/projects/${widget.projectId}/issues?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
-  //   );
-  //   final response = await http.get(url);
-  //   print("ppppppppppppppppppp");
-  //   print(widget.projectId);
-  //
-  //   final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-  //   Issues = parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
-  //
-  //   setState(() {
-  //     isIssueLoading = false;
-  //     filteredIssues = Issues;
-  //   });
-  //   print('Response status: ${response.statusCode}');
-  //   print('Response body: ${response.body}');
-  // }
+  int countStatus(List<Issue> Issues , String status){
+    int count = 0;
+    for (int i=0; i<Issues.length;i++){
+      if (Issues[i].status == status) {
+        count++;
+      }
+    }
+    return count;
+
+  }
   Future<void> getIssueData() async {
     final url = Uri.parse(
       'http://localhost:8080/projects/${widget.projectId}/issues?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
     final response = await http.get(url);
+
     print('Response body: ${response.body}');
     if (response.statusCode == 200) {
       final List<dynamic> parsed = jsonDecode(response.body);
+      print(parsed);
       setState(() {
         Issues = parsed.map<Issue>((json) => Issue.fromJson(json)).toList();
+
+        data = [
+          new IssueStatistics('NEW', countStatus(Issues,'NEW')),
+          new IssueStatistics('CLOSED', countStatus(Issues,'CLOSED')),
+          new IssueStatistics('ASSIGNED', countStatus(Issues,'ASSIGNED')),
+          new IssueStatistics('RESOLVED', countStatus(Issues,'RESOLVED')),
+          new IssueStatistics('FIXED', countStatus(Issues,'FIXED')),
+        ];
+
         isIssueLoading = false;
       });
     } else {
@@ -78,21 +88,28 @@ class _ProjectBodyState extends State<ProjectBody> {
 
   getProjectData(int projectId) async {
     final url = Uri.parse(
-      'http://localhost:8080/projects/${widget.projectId}?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
+      'http://localhost:8080/projects/$projectId?username=${context.read<profile>().username}&password=${context.read<profile>().password}',
     );
     final response = await http.get(url);
+    print("eeeeeeeeeeeeeeeeee");
     print(response.body);
 
-    final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-    currentProject =
-        parsed.map<Project>((json) => Project.fromJson(json)).toList();
+    if (response.statusCode == 200) {
+      final parsed = jsonDecode(response.body) as Map<String, dynamic>;
+      currentProject = Project.fromJson(parsed);
 
-    setState(() {
-      isProjectLoading = false;
-    });
+      setState(() {
+        isProjectLoading = false;
+      });
+    } else {
+      print('Failed to load project data');
+    }
+
+    print("dddddddddddddddddd");
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
+
 
   void _sortIssues(String criteria) {
     setState(() {
@@ -105,11 +122,24 @@ class _ProjectBodyState extends State<ProjectBody> {
           if (a.assignee == null && b.assignee == null) {
             return 0;
           } else if (a.assignee == null) {
-            return 1; // null values go to the end
-          } else if (b.assignee == null) {
             return -1; // null values go to the end
+          } else if (b.assignee == null) {
+            return 1; // null values go to the end
           } else {
-            return a.assignee!.compareTo(b.assignee!);
+            return -1*(a.assignee.username!.compareTo(b.assignee.username!));
+          }
+        });
+      }
+      else if (criteria == 'reporter') {
+        Issues.sort((a, b) {
+          if (a.reporter == null && b.reporter == null) {
+            return 0;
+          } else if (a.reporter == null) {
+            return -1; // null values go to the end
+          } else if (b.reporter == null) {
+            return 1; // null values go to the end
+          } else {
+            return -1*(a.reporter.username!.compareTo(b.reporter.username!));
           }
         });
       }
@@ -132,7 +162,9 @@ class _ProjectBodyState extends State<ProjectBody> {
                 .contains(searchKeyword.toLowerCase());
           } else if (searchField == 'Assignee') {
 
-            return issue.assignee?.toLowerCase().contains(searchKeyword.toLowerCase()) ?? false;
+            return issue.assignee.username
+                .toLowerCase()
+                .contains(searchKeyword.toLowerCase());
           } else if (searchField == 'Priority') {
             return issue.priority
                 .toLowerCase()
@@ -143,31 +175,70 @@ class _ProjectBodyState extends State<ProjectBody> {
       }
     });
   }
+  List<String> permission = [];
+  List<String> permissionOptions = ['admin', 'pl', 'tester', 'dev'];
+  List<bool> permissionRequest = [];
+
+  List<bool> convertPermissionToRequest(List<String> permission) {
+    // [ 'pl', 'tester'] 이거를 [ false, true, true, false ] 이런 식으로 바꾸어서 요청 보낼 때 편하게 하는 거
+    List<String> allPermissions = ['admin', 'pl', 'tester', 'dev'];
+    List<bool> permissionRequest = [];
+
+    for (String perm in allPermissions) {
+      if (permission.contains(perm)) {
+        permissionRequest.add(true);
+      } else {
+        permissionRequest.add(false);
+      }
+    }
+
+    return permissionRequest;
+  }
+  List<String> extractUserIds(List<User> userList) {
+    return userList.map((user) => user.username).toList();
+  }
+  getAllUsers() async {
+    final url = Uri.parse(
+        'http://localhost:8080/users?username=${context.read<profile>().username}&password=${context.read<profile>().password}');
+    final response = await http.get(url);
+    final parsed = jsonDecode(utf8.decode(response.bodyBytes))
+        .cast<Map<String, dynamic>>();
+    print('Response body: ${response.body}');
+    Users = parsed.map<User>((json) => User.fromJson(json)).toList();
+    assigneeOptions = extractUserIds(Users);
+    print("ppppppppppp");
+    print(assigneeOptions);
+    setState(() {
+      null;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     getIssueData();
     getProjectData(widget.projectId);
+    getAllUsers();
+    filteredIssues = Issues;
   }
 
   Widget build(BuildContext context) {
-    if (Issues.isEmpty) {
-      return Column(children: [
-        SizedBox(
-          height: 20,
-        ),
-        CircularProgressIndicator(),
-        SizedBox(
-          height: 20,
-        ),
-        _buildFormField(context),
-        SizedBox(
-          height: 20,
-        ),
-        CreateIssueButton(),
-      ]);
-    }
+    // if (Issues.isEmpty) {
+    //   return Column(children: [
+    //     SizedBox(
+    //       height: 20,
+    //     ),
+    //     CircularProgressIndicator(),
+    //     SizedBox(
+    //       height: 20,
+    //     ),
+    //     _buildFormField(context),
+    //     SizedBox(
+    //       height: 20,
+    //     ),
+    //     CreateIssueButton(),
+    //   ]);
+    // }
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -175,12 +246,14 @@ class _ProjectBodyState extends State<ProjectBody> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Project Summary', style: subtitle1()),
-            SizedBox(height: 10),
-            _buildFormField(context),
-            SizedBox(
-              height: 20,
-            ),
-            CreateIssueButton(),
+            _buildProjectInfo(context),
+            SizedBox(height: 20),
+            Text('Issue Statistics', style: subtitle1()),
+            SizedBox(height: 20),
+            _buildIssueStatistics(context,data), // 통계 차트 추가
+
+            SizedBox(height: 20),
+            // ProjectDescription(),
             SizedBox(height: 20),
             Text('Sort Issues By:', style: subtitle2()),
             Row(
@@ -198,6 +271,10 @@ class _ProjectBodyState extends State<ProjectBody> {
                   onPressed: () => _sortIssues('assignee'),
                   child: Text('Assignee'),
                 ),
+                ElevatedButton(
+                  onPressed: () => _sortIssues('reporter'),
+                  child: Text('reporter'),
+                ),
               ],
             ),
             SizedBox(height: 20),
@@ -210,6 +287,7 @@ class _ProjectBodyState extends State<ProjectBody> {
                     setState(() {
                       searchField = newValue!;
                     });
+                    _filterIssues();
                   },
                   items: <String>['Title', 'Reporter', 'Assignee', 'Priority']
                       .map<DropdownMenuItem<String>>((String value) {
@@ -225,6 +303,7 @@ class _ProjectBodyState extends State<ProjectBody> {
                     onChanged: (value) {
                       searchKeyword = value;
                       _filterIssues();
+                      print(filteredIssues);
                     },
                     decoration: InputDecoration(
                       labelText: 'Search',
@@ -237,55 +316,76 @@ class _ProjectBodyState extends State<ProjectBody> {
             SizedBox(height: 20),
             Text('Issue Descriptions:', style: subtitle1()),
 
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: Issues.length,
-              itemBuilder: (context, index) {
-                final issue = Issues[index];
-                return Card(
-                  elevation: 4,
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                    child: InkWell(
-                    onTap: () {
-                  print('Issue #${index} clicked!');
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IssuePage(projectId: widget.projectId, issueId: issue.issueId,),
-                    ),
-                  );
-                },
+            PrintIssue(),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Issue ID: ${issue.issueId}',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Text('Title: ${issue.title}'),
-                        SizedBox(height: 4),
-                        Text('Reporter: ${issue.reporter}'),
-                        SizedBox(height: 4),
-                        Text('Assigned to: ${issue.assignee}'),
-                        SizedBox(height: 4),
-                        Text('Priority: ${issue.priority}'),
-                        SizedBox(height: 4),
-                        Text('Status: ${issue.status}'),
-                      ],
-                    ),
-                  ),),
+
+            Divider(),
+            Text('Change Member permission:', style: subtitle2()),
+            DropdownButtonFormField<String>(
+              //project assign part
+              value: assignee.isNotEmpty ? assignee : null,
+              decoration: InputDecoration(labelText: 'All users'),
+              items: assigneeOptions.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
                 );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  assignee = newValue!;
+                });
               },
             ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: permissionOptions.map((String value) {
+                return CheckboxListTile(
+                  // project role assign part
+                  title: Text(value),
+                  value: permission.contains(value),
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      if (newValue == true) {
+                        permission.add(value);
+                      } else {
+                        permission.remove(value);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            AddMemberButton(),
+            Divider(),
+            SizedBox(height: 10),
+            Text('Add Issues:', style: subtitle2()),
+            _buildFormField(context),
+            SizedBox(
+              height: 20,
+            ),
+            CreateIssueButton(),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildProjectInfo(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        SizedBox(height: 10),
+        Text('${currentProject.name}'),
+        SizedBox(height: 4),
+        Text('Project description: ${currentProject.description ?? 'None'}'),
+        SizedBox(height: 4),
+        //Text('members: ${currentProject.members}'),
+
+      ],
+    );
+  }
   Widget IssueCard(Issue issue) {
     return Card(
       elevation: 2.0,
@@ -298,11 +398,13 @@ class _ProjectBodyState extends State<ProjectBody> {
             Text('Issue ID: ${issue.issueId}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
-            Text('Title: ${issue.title}'),
+            Text('${issue.title}'),
             SizedBox(height: 4),
             Text('Reporter: ${issue.reporter}'),
             SizedBox(height: 4),
-            Text('Assigned to: ${issue.assignee}'),
+            Text('Assigned to: ${issue.assignee.username}'),
+            SizedBox(height: 4),
+            Text('Fixed by: ${issue.fixer.username}'),
             SizedBox(height: 4),
             Text('Priority: ${issue.priority}'),
             SizedBox(height: 4),
@@ -313,6 +415,118 @@ class _ProjectBodyState extends State<ProjectBody> {
     );
   }
 
+  Widget PrintIssue() {
+    if (Issues.isEmpty){
+      return Text("No Issues");
+    }
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: Issues.length,
+      //-------------------------
+      itemBuilder: (context, index) {
+        final issue = Issues[index];//final issue = filteredIssues[index];
+        //-------------------------
+        return Card(
+          elevation: 4,
+          margin: EdgeInsets.symmetric(vertical: 8),
+          child: InkWell(
+            onTap: () {
+              print('Issue #${index} clicked!');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => IssuePage(projectId: widget.projectId, issueId: issue.issueId,),
+                ),
+              );
+
+            },
+
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${issue.title}',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  Text('Issue ID: ${issue.issueId}'),
+                  SizedBox(height: 4),
+                  Text('Reporter: ${issue.reporter.username}'),
+                  SizedBox(height: 4),
+                  Text('Assigned to: ${issue.assignee.username}'),
+                  SizedBox(height: 4),
+                  Text('Fixed by: ${issue.fixer.username}'),
+                  SizedBox(height: 4),
+                  Text('Priority: ${issue.priority}'),
+                  SizedBox(height: 4),
+                  Text('Status: ${issue.status}'),
+                ],
+              ),
+            ),),
+        );
+      },
+    );
+
+
+  }
+
+  Widget AddMemberButton() {
+    return ElevatedButton.icon(
+      onPressed: () async {
+        int addMemberId=0;
+        if (this.formKey.currentState!.validate()) {
+          this.formKey.currentState?.save();
+        }
+        for(int i=0;i<Users.length;i++){
+
+          if (Users[i].username==assignee){
+            addMemberId = Users[i].id;
+          }
+        }
+        print("|||||||||||||||||||||");
+
+        print(addMemberId);
+        permissionRequest =convertPermissionToRequest(permission);
+
+
+        final url = Uri.parse(
+          'http://localhost:8080/projects/${widget.projectId}/permissions/${addMemberId}',
+        );
+        final response = await http.post(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, dynamic>{
+            "username" : context.read<profile>().username,
+            "password" : context.read<profile>().password,
+            "permissions" : permissionRequest,
+          })
+        );
+        print(jsonEncode(<String, dynamic>{
+          "username" : context.read<profile>().username,
+          "password" : context.read<profile>().password,
+          "permissions" : permissionRequest,
+        }));
+        print(response.body);
+        if (response.statusCode == 201) {
+
+          FlutterDialog(context, 'Member assigned as ${permission.join(",")}');
+          getIssueData();
+        } else {
+          FlutterDialog(context, 'Member assigned as ${permission.join(",")}');
+//_________________________________ 멤버 배정 에러
+          print('ERROR Status code: ${response.statusCode}');
+        }
+        setState(() {
+          isIssueLoading = false;
+        });
+      },
+      icon: Icon(Icons.add, size: 18),
+      label: Text("Add member"),
+    );
+  }
   Widget CreateIssueButton() {
     return ElevatedButton.icon(
       onPressed: () async {
@@ -331,8 +545,7 @@ class _ProjectBodyState extends State<ProjectBody> {
             body: jsonEncode(<String, String>{
               "username": context.read<profile>().username,
               "password": context.read<profile>().password,
-              // "username": "12",
-              // "password": "12",
+
               "title": title,
               "priority": priority,
             }));
@@ -340,8 +553,7 @@ class _ProjectBodyState extends State<ProjectBody> {
         print(jsonEncode(<String, String>{
           "username": context.read<profile>().username,
           "password": context.read<profile>().password,
-          // "username": "12",
-          // "password": "12",
+
           "title": title,
           "priority": priority,
         }));
@@ -377,7 +589,7 @@ class _ProjectBodyState extends State<ProjectBody> {
             Text('Issue ID: ${currentProject.id}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
-            Text('Title: ${currentProject.name}'),
+            Text(' ${currentProject.name}'),
             SizedBox(height: 4),
             Text('Reporter: ${currentProject.description}'),
             SizedBox(height: 4),
@@ -393,8 +605,6 @@ class _ProjectBodyState extends State<ProjectBody> {
     required FormFieldSetter onSaved,
     required FormFieldValidator validator,
   }) {
-    assert(onSaved != null);
-    assert(validator != null);
 
     return Column(
       children: [
@@ -439,18 +649,19 @@ class _ProjectBodyState extends State<ProjectBody> {
                 },
               ),
               renderTextFormField(
-                label: 'priority pick one from HIGH, LOW, MEDIUM, CRITICAL',
+                label: 'Write MAJOR or BLOCKER or MINOR or CRITICAL or TRIVIAL',
                 onSaved: (val) {
                   this.priority = val;
                 },
                 validator: (val) {
-                  if (val == "HIGH" ||
-                      val == "LOW" ||
-                      val == "MEDIUM" ||
-                      val == "CRITICAL")
+                  if (val == "MAJOR" ||
+                      val == "BLOCKER" ||
+                      val == "MINOR" ||
+                      val == "CRITICAL" ||
+                      val == "TRIVIAL")
                     return null;
                   else
-                    return "Write HIGH or LOW or MEDIUM or CRITICAL ";
+                    return "Write MAJOR or BLOCKER or MINOR or CRITICAL or TRIVIAL";
                 },
               ),
             ],
@@ -459,4 +670,34 @@ class _ProjectBodyState extends State<ProjectBody> {
       ),
     );
   }
+  Widget _buildIssueStatistics(BuildContext context ,var data) {
+    // var data = [
+    //   new IssueStatistics('NEW', 5),
+    //   new IssueStatistics('CLOSED', 3),
+    //   new IssueStatistics('ASSIGNED', 2),
+    //   new IssueStatistics('RESOLVED', 4),
+    //   new IssueStatistics('FIXED', 1),
+    // ];
+
+
+    var series = [
+      new charts.Series(
+        id: 'Issues',
+        domainFn: (IssueStatistics stats, _) => stats.status,
+        measureFn: (IssueStatistics stats, _) => stats.count,
+        data: data,
+      ),
+    ];
+
+    var chart = new charts.BarChart(
+      series,
+      animate: true,
+    );
+
+    return new SizedBox(
+      height: 200.0,
+      child: chart,
+    );
+  }
+
 }
